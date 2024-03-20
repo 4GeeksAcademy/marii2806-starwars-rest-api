@@ -51,7 +51,7 @@ def list_people():
 @app.route('/people/<int:people_id>', methods=['GET'])
 def get_person(people_id):
     person = Character.query.get(people_id)
-    if person is None:
+    if not person:
         raise APIException("Person was not found, please try again", status_code=404)
     return jsonify(person.serialize()), 200
 
@@ -64,7 +64,7 @@ def list_planets():
 @app.route('/planets/<int:planet_id>', methods=['GET'])
 def get_planet(planet_id):
     planet = Planet.query.get(planet_id)
-    if planet is None:
+    if not planet:
         raise APIException("Planet was not found, please try again", status_code=404)
     return jsonify(planet.serialize()), 200
 
@@ -72,9 +72,9 @@ def get_planet(planet_id):
 def retrieve_user_favorites():
     user_id = request.args.get('user_id')
     user = User.query.get(user_id)
-    if user is None:
+    if not user:
         user = User.query.first()
-        if user is None:
+        if not user:
             raise APIException("User was not found, please try again", status_code=404)
     
     favorites = Favorite.query.filter_by(user_id=user_id).all()
@@ -85,7 +85,7 @@ def retrieve_user_favorites():
 def add_favorite_planet(planet_id):
     user_id = request.args.get('user_id')
     user = User.query.get(user_id)
-    if user is None:
+    if not user:
         raise APIException("User was not found, please try again", status_code=404)
     
     favorite = Favorite(name="planet", user_id=user_id, planet_id=planet_id)
@@ -98,7 +98,7 @@ def add_favorite_planet(planet_id):
 def add_favorite_people(people_id):
     user_id = request.args.get('user_id')
     user = User.query.get(user_id)
-    if user is None:
+    if not user:
         raise APIException("User was not found, please try again", status_code=404)
     
     favorite = Favorite(name="people", user_id=user_id, character_id=people_id)
@@ -111,19 +111,19 @@ def add_favorite_people(people_id):
 def remove_favorite_planet(planet_id):
     user_id = request.args.get('user_id')
     favorite = Favorite.query.filter_by(user_id=user_id, planet_id=planet_id).first()
-    if favorite is None:
+    if not favorite:
         raise APIException("Favorite planet was not found, please try again", status_code=404)
     
     db.session.delete(favorite)
     db.session.commit()
     
-    return jsonify({"message": "Favorite planet removed successfully"}), 200
+    return jsonify({"message": "Favorite planet removed successfully!"}), 200
 
 @app.route('/favorite/people/<int:people_id>', methods=['DELETE'])
 def remove_favorite_people(people_id):
     user_id = request.args.get('user_id')
     favorite = Favorite.query.filter_by(user_id=user_id, character_id=people_id).first()
-    if favorite is None:
+    if not favorite:
         raise APIException("Favorite people were not found, please try again", status_code=404)
     
     db.session.delete(favorite)
